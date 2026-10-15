@@ -33,7 +33,7 @@
             width: 100%;
             max-width: 480px;
             background: var(--card-bg);
-            min-height: 100vh;
+            height: 100vh;
             box-shadow: 0 0 20px rgba(255, 71, 87, 0.1);
             display: flex;
             flex-direction: column;
@@ -42,18 +42,18 @@
 
         @media(min-width: 481px) {
             .container {
-                min-height: 85vh;
+                height: 85vh;
                 border-radius: 20px;
                 overflow: hidden;
             }
         }
 
-        /* Ekranlar */
         .screen {
             display: none;
             flex: 1;
             flex-direction: column;
             height: 100%;
+            overflow: hidden;
         }
 
         .screen.active {
@@ -68,16 +68,6 @@
             text-align: center;
             background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
             color: white;
-        }
-
-        #login-screen h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-
-        #login-screen p {
-            margin-bottom: 30px;
-            opacity: 0.9;
         }
 
         .login-box {
@@ -101,10 +91,6 @@
             outline: none;
         }
 
-        .login-box input:focus {
-            border-color: var(--primary);
-        }
-
         .btn {
             background: var(--primary);
             color: white;
@@ -118,18 +104,12 @@
             transition: 0.2s;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
+        .btn:hover { opacity: 0.9; }
+        .btn.secondary { background: #747d8c; margin-top: 10px; font-size: 0.8rem; padding: 6px;}
 
-        #error-msg {
-            color: #ff4757;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            display: none;
-        }
+        #error-msg { color: #ff4757; margin-top: 10px; font-size: 0.9rem; display: none; }
 
-        /* Ana İçerik Header */
+        /* Header */
         header {
             background: var(--primary);
             color: white;
@@ -139,10 +119,6 @@
             align-items: center;
         }
 
-        header h2 {
-            font-size: 1.2rem;
-        }
-
         .logout-btn {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -150,10 +126,9 @@
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
         }
 
-        /* Sekmeler (Tabs) */
+        /* Sekme İçerikleri */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -171,18 +146,16 @@
             display: flex;
             background: white;
             border-top: 1px solid #eee;
+            height: 60px;
         }
 
         nav button {
             flex: 1;
             background: none;
             border: none;
-            padding: 12px 0;
-            font-size: 0.85rem;
             color: #747d8c;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
         }
 
         nav button.active {
@@ -190,36 +163,88 @@
             border-top: 3px solid var(--primary);
         }
 
-        /* Sayaç Kutusu */
-        .counter-card {
+        /* Doğum Günü Kutuları */
+        .countdown-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .countdown-card {
             background: linear-gradient(135deg, #ff6b81, #ff4757);
             color: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(255,71,87,0.2);
+        }
+
+        .countdown-card h3 { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;}
+        .countdown-card .days { font-size: 1.8rem; font-weight: bold; margin: 5px 0;}
+        .countdown-card p { font-size: 0.8rem; opacity: 0.8;}
+
+        /* Durum Takip Paneli (Senin Göreceğin Yer) */
+        .status-tracker {
+            background: #fff;
+            border: 2px solid #ffe0e6;
+            padding: 15px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(255,71,87,0.3);
         }
-
-        .counter-card h3 {
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
         }
-
-        #time-together {
-            font-size: 1.2rem;
+        .status-item:last-child { border: none; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: bold;
         }
+        .badge.active-regl { background: #ff4757; color: white; }
+        .badge.active-moral { background: #ffa502; color: white; }
+        .badge.normal { background: #2ed573; color: white; }
 
-        /* Chat Alanı */
+        /* Sevgilinin Özel Butonları (Onun Göreceği Yer) */
+        .partner-controls {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .status-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        .status-btn.active-r { border-color: #ff4757; background: #ffe0e6; color: #ff4757; }
+        .status-btn.active-m { border-color: #ffa502; background: #fff4e0; color: #ffa502; }
+
+        /* Sabitlenmiş Chat Alanı */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 15px;
-            max-height: calc(100vh - 250px);
+            padding-right: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #f1f2f6;
+            border-radius: 8px;
+            background: #fafafa;
         }
 
         .message {
@@ -228,75 +253,20 @@
             border-radius: 12px;
             font-size: 0.95rem;
             word-break: break-word;
-            position: relative;
         }
 
-        .message.mine {
-            background: #ff4757;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
+        .message.mine { background: #ff4757; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .message.theirs { background: #e4e6eb; color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message .sender-name { font-size: 0.7rem; opacity: 0.8; margin-bottom: 3px; display: block; }
 
-        .message.theirs {
-            background: #f1f2f6;
-            color: var(--text-color);
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
+        .chat-input-area { display: flex; gap: 8px; height: 45px; }
+        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        .chat-input-area button { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        .message .sender-name {
-            font-size: 0.7rem;
-            opacity: 0.8;
-            margin-bottom: 3px;
-            display: block;
-        }
-
-        .chat-input-area {
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-            font-size: 0.95rem;
-        }
-
-        .chat-input-area button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* Ayarlar & Şifre Değiştirme */
-        .settings-group {
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #eee;
-            margin-bottom: 15px;
-        }
-
-        .settings-group h4 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        .settings-group input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
+        /* Ayarlar */
+        .settings-group { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 15px; }
+        .settings-group h4 { margin-bottom: 10px; color: var(--primary); }
+        .settings-group input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -310,6 +280,7 @@
                 <input type="password" id="password-input" placeholder="••••" maxlength="6">
                 <button class="btn" onclick="tryLogin()">Giriş Yap</button>
                 <div id="error-msg">Geçersiz şifre!</div>
+                <button class="btn secondary" onclick="simulateRoleSwitch()">Giriş Modu: <span id="current-sim-role">Ben</span> (Değiştir)</button>
             </div>
         </div>
 
@@ -320,211 +291,22 @@
                 <button class="logout-btn" onclick="logout()">Çıkış</button>
             </header>
 
-            <!-- SEKME 1: ANASAYFA / SAYAC -->
+            <!-- SEKME 1: ANASAYFA -->
             <div id="tab-home" class="content-area active">
-                <div class="counter-card">
-                    <h3>Birlikte Geçen Zamanımız</h3>
-                    <div id="time-together">Hesaplanıyor...</div>
-                </div>
-                <div class="settings-group">
-                    <h4>İlişki Yıldönümü</h4>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">Birlikte olduğunuz tarihi seçin:</p>
-                    <input type="date" id="anniversary-date" onchange="updateAnniversary()">
-                </div>
-            </div>
-
-            <!-- SEKME 2: SOHBET -->
-            <div id="tab-chat" class="content-area">
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Mesajlar buraya gelecek -->
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="message-input" placeholder="Tatlı bir şeyler yaz..." onkeypress="handleKeyPress(event)">
-                    <button onclick="sendMessage()">Gönder</button>
-                </div>
-            </div>
-
-            <!-- SEKME 3: AYARLAR -->
-            <div id="tab-settings" class="content-area">
-                <div class="settings-group">
-                    <h4>Şifreni Değiştir</h4>
-                    <input type="password" id="old-pass" placeholder="Mevcut Şifren">
-                    <input type="password" id="new-pass" placeholder="Yeni Şifren">
-                    <button class="btn" onclick="changePassword()">Şifreyi Güncelle</button>
-                    <p id="pass-msg" style="font-size: 0.85rem; margin-top: 8px; color: green; display: none;"></p>
-                </div>
-            </div>
-
-            <!-- ALT NAVİGASYON -->
-            <nav>
-                <button class="active" onclick="switchTab('home', this)">Ana Sayfa</button>
-                <button onclick="switchTab('chat', this)">Sohbet</button>
-                <button onclick="switchTab('settings', this)">Ayarlar</button>
-            </nav>
-        </div>
-    </div>
-
-    <script>
-        // Varsayılan Şifreler ve İsimler (İstediğin gibi değiştirebilirsin)
-        // Kullanıcı 1 (Sen): Şifre "1453"
-        // Kullanıcı 2 (Sevgilin): Şifre "1903"
-        let users = JSON.parse(localStorage.getItem('couple_users')) || {
-            user1: { name: "Sen", pass: "1453" },
-            user2: { name: "Sevgilin", pass: "1903" }
-        };
-
-        let currentUser = null;
-
-        // Şifre Giriş Kontrolü
-        function tryLogin() {
-            const inputVal = document.getElementById('password-input').value.trim();
-            const errorMsg = document.getElementById('error-msg');
-
-            if (inputVal === users.user1.pass) {
-                currentUser = 'user1';
-            } else if (inputVal === users.user2.pass) {
-                currentUser = 'user2';
-            } else {
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            errorMsg.style.display = 'none';
-            document.getElementById('password-input').value = '';
-            
-            // Giriş başarılı, ana ekrana geç
-            document.getElementById('login-screen').classList.remove('active');
-            document.getElementById('main-screen').classList.add('active');
-            
-            document.getElementById('welcome-titleinnerText').innerText = `Hoş Geldin, ${users[currentUser].name} ❤️`;
-            
-            loadAppData();
-        }
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('main-screen').classList.remove('active');
-            document.getElementById('login-screen').classList.add('active');
-        }
-
-        // Sekme Değiştirme
-        function switchTab(tabName, btnElement) {
-            document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
-
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            btnElement.classList.add('active');
-        }
-
-        // Sayaç ve Tarih İşlemleri
-        let anniversary = localStorage.getItem('couple_anniversary') || '2023-01-01';
-        document.getElementById('anniversary-date').value = anniversary;
-
-        function updateAnniversary() {
-            anniversary = document.getElementById('anniversary-date').value;
-            localStorage.setItem('couple_anniversary', anniversary);
-        }
-
-        function calculateTimeTogether() {
-            const start = new Date(anniversary);
-            const now = new Date();
-            const diff = now - start;
-
-            if (diff < 0) {
-                document.getElementById('time-together').innerText = "Gelecekten mi geldiniz? Tarihi kontrol edin 😊";
-                return;
-            }
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / 1000 / 60) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-
-            document.getElementById('time-together').innerText = `${days} Gün ${hours} Saat ${minutes} Dakika ${seconds} Saniye`;
-        }
-        setInterval(calculateTimeTogether, 1000);
-
-        // Sohbet Sistemi
-        let messages = JSON.parse(localStorage.getItem('couple_messages')) || [];
-
-        function renderMessages() {
-            const container = document.getElementById('chat-messages');
-            container.innerHTML = '';
-
-            if (messages.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#aaa; margin-top:20px;">Henüz mesaj yok. İlk mesajı sen gönder! ✨</p>';
-                return;
-            }
-
-            messages.forEach(msg => {
-                const div = document.createElement('div');
-                const isMine = msg.sender === currentUser;
-                div.className = `message ${isMine ? 'mine' : 'theirs'}`;
                 
-                div.innerHTML = `
-                    <span class="sender-name">${users[msg.sender].name}</span>
-                    ${msg.text}
-                `;
-                container.appendChild(div);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
+                <!-- DOĞUM GÜNÜ SAYACI -->
+                <div class="countdown-container">
+                    <div class="countdown-card">
+                        <h3 id="label-user-birthday">Doğum Günüme</h3>
+                        <div class="days" id="user-birthday-countdown">--</div>
+                        <p>Gün Kaldı</p>
+                    </div>
+                    <div class="countdown-card">
+                        <h3 id="label-partner-birthday">Doğum Gününe</h3>
+                        <div class="days" id="partner-birthday-countdown">--</div>
+                        <p>Gün Kaldı</p>
+                    </div>
+                </div>
 
-        function sendMessage() {
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            messages.push({
-                sender: currentUser,
-                text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-
-            localStorage.setItem('couple_messages', JSON.stringify(messages));
-            input.value = '';
-            renderMessages();
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        // Şifre Değiştirme
-        function changePassword() {
-            const oldPass = document.getElementById('old-pass').value.trim();
-            const newPass = document.getElementById('new-pass').value.trim();
-            const msgEl = document.getElementById('pass-msg');
-
-            if (oldPass !== users[currentUser].pass) {
-                msgEl.style.color = 'red';
-                msgEl.innerText = "Mevcut şifrenizi yanlış girdiniz!";
-                msgEl.style.display = 'block';
-                return;
-            }
-
-            if (!newPass || newPass.length < 3) {
-                msgEl.style.color = 'red';
-                msgEl.innerText = "Yeni şifre en az 3 karakter olmalıdır!";
-                msgEl.style.display = 'block';
-                return;
-            }
-
-            users[currentUser].pass = newPass;
-            localStorage.setItem('couple_users', JSON.stringify(users));
-
-            msgEl.style.color = 'green';
-            msgEl.innerText = "Şifreniz başarıyla değiştirildi! 🎉";
-            msgEl.style.display = 'block';
-
-            document.getElementById('old-pass').value = '';
-            document.getElementById('new-pass').value = '';
-        }
-
-        function loadAppData() {
-            calculateTimeTogether();
-            renderMessages();
-        }
-    </script>
-</body>
-</html>
+                <!-- DURUM TAKİP PANELİ (SENİN EKRANIN) -->
+                <div id="my-view-panel" class="status-tracker">
