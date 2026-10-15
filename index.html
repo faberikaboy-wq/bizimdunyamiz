@@ -180,11 +180,11 @@
             box-shadow: 0 4px 15px rgba(255,71,87,0.2);
         }
 
-        .countdown-card h3 { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;}
+        .countdown-card h3 { font-size: 0.85rem; opacity: 0.9; margin-bottom: 5px;}
         .countdown-card .days { font-size: 1.8rem; font-weight: bold; margin: 5px 0;}
         .countdown-card p { font-size: 0.8rem; opacity: 0.8;}
 
-        /* Durum Takip Paneli (Senin Göreceğin Yer) */
+        /* Durum Takip Paneli */
         .status-tracker {
             background: #fff;
             border: 2px solid #ffe0e6;
@@ -210,7 +210,7 @@
         .badge.active-moral { background: #ffa502; color: white; }
         .badge.normal { background: #2ed573; color: white; }
 
-        /* Sevgilinin Özel Butonları (Onun Göreceği Yer) */
+        /* Medoş'un Özel Butonları */
         .partner-controls {
             background: #f1f2f6;
             padding: 15px;
@@ -240,7 +240,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            padding-right: 5px;
+            padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #f1f2f6;
             border-radius: 8px;
@@ -280,7 +280,7 @@
                 <input type="password" id="password-input" placeholder="••••" maxlength="6">
                 <button class="btn" onclick="tryLogin()">Giriş Yap</button>
                 <div id="error-msg">Geçersiz şifre!</div>
-                <button class="btn secondary" onclick="simulateRoleSwitch()">Giriş Modu: <span id="current-sim-role">Ben</span> (Değiştir)</button>
+                <button class="btn secondary" onclick="simulateRoleSwitch()">Giriş Modu: <span id="current-sim-role">Hipoş</span> (Değiştir)</button>
             </div>
         </div>
 
@@ -293,7 +293,6 @@
 
             <!-- SEKME 1: ANASAYFA -->
             <div id="tab-home" class="content-area active">
-                
                 <!-- DOĞUM GÜNÜ SAYACI -->
                 <div class="countdown-container">
                     <div class="countdown-card">
@@ -308,5 +307,6 @@
                     </div>
                 </div>
 
-                <!-- DURUM TAKİP PANELİ (SENİN EKRANIN) -->
+                <!-- DURUM TAKİP PANELİ (HİPOŞ GÖRÜR) -->
                 <div id="my-view-panel" class="status-tracker">
+                    <h4>Medoş'un Anlık Durumu 👑</h4>
