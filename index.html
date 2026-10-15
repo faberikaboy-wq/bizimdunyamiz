@@ -146,7 +146,7 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 // Firebase konsolundan aldığın ayarları buraya yapıştır
-const FIREBASE_CONFIG={apiKey:'BURAYA',authDomain:'',projectId:'',storageBucket:'',messagingSenderId:'',appId:''};
+const FIREBASE_CONFIG={apiKey:'AIzaSyCBGX1kR7IUyo_-Oq6oIb9HNkbrbb7T8Ck',authDomain:'mesaj-uygulamasi-8b5c8.firebaseapp.com',projectId:'mesaj-uygulamasi-8b5c8',storageBucket:'mesaj-uygulamasi-8b5c8.firebasestorage.app',messagingSenderId:'451889654200',appId:'1:451889654200:web:1b61bfda416506993b074d'};
 </script>
 <script>
 const DEFAULTS={names:{user1:"Hipoş",user2:"Medoş"},pass:{user1:"1453",user2:"1903"},bday:{user1:"",user2:""},period:{last:"",cycle:28,len:5,startedAt:0,ack:0,endedAt:0,endAck:0},miss:{user1:0,user2:0},missAck:{user1:0,user2:0},qa:{},mood:{user1:{bad:false,ts:0},user2:{bad:false,ts:0}}};
@@ -310,7 +310,7 @@ async function init(){
     $('load-status').textContent='';
     if(me&&!$('main-screen').classList.contains('active'))enter();else renderAll();
   },e=>{$('load-status').textContent='Bağlantı hatası.'});
-  db.collection('messages').orderBy('ts','desc').limit(500).onSnapshot(snap=>{
+  db.collection('messages').orderBy('ts','desc').limit(100).onSnapshot(snap=>{
     msgs=snap.docs.map(d=>d.data()).reverse();renderMessages();
   },e=>{$('chat-status').textContent='Mesajlar yüklenemedi.'});
 }
