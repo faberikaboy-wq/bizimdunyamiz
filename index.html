@@ -94,6 +94,12 @@ nav button:active{transform:scale(.92)}
 .pet.jump .body{animation:bigjump .6s}
 .bub{position:absolute;bottom:100%;width:130px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:5px 7px;font-size:.68rem;opacity:0;pointer-events:none;text-align:center}
 .bub.show{animation:bubble 2.4s both}
+@keyframes climbw{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+.pets{top:0;height:auto;bottom:50px}
+.pet{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.pet.climb .body{animation:climbw .5s infinite}
+.pet.drag{cursor:grabbing;z-index:9}
+.pet.drag .body{transform:scale(1.25) rotate(-8deg)}
 </style>
 </head>
 <body>
@@ -318,22 +324,45 @@ function startPets(){
   [['🐼','user1',' seni çok seviyor 🐼💗'],['🐰','user2',' seni çok seviyor 🐰💗']].forEach((p,i)=>{
     const el=document.createElement('div');el.className='pet';el.dataset.u=p[1];
     el.innerHTML='<div class="bub"></div><div class="body"></div><small></small>';
-    el.querySelector('.body').textContent=p[0];el.style.left=(30+i*140)+'px';L.appendChild(el);
-    const bub=el.querySelector('.bub');
-    el.onclick=()=>{
-      const w=L.clientWidth,pl=parseFloat(el.style.left)||0,bl=Math.max(4,Math.min(w-134,pl+22-65));
-      bub.style.left=(bl-pl)+'px';bub.textContent=(S?S.names[p[1]]:'')+p[2];
-      bub.classList.remove('show');void bub.offsetWidth;bub.classList.add('show');
-      el.classList.add('jump');setTimeout(()=>el.classList.remove('jump'),600);
+    el.querySelector('.body').textContent=p[0];el.style.left=(30+i*140)+'px';el.style.bottom='0px';L.appendChild(el);
+    const bub=el.querySelector('.bub');let seq=0,drag=false,busy=false,moved=false,sx=0,sy=0;
+    const mv=(x,y,t,tb)=>{el.style.transition='left '+t+'s ease-in-out,bottom '+tb+'s ease-out';if(x!==null)el.style.left=x+'px';if(y!==null)el.style.bottom=y+'px'};
+    const say=txt=>{
+      const w=L.clientWidth,pl=parseFloat(el.style.left)||0,pb=parseFloat(el.style.bottom)||0,bl=Math.max(4,Math.min(w-134,pl+22-65));
+      bub.style.left=(bl-pl)+'px';
+      if(pb>L.clientHeight-90){bub.style.bottom='auto';bub.style.top='100%'}else{bub.style.top='auto';bub.style.bottom='100%'}
+      bub.textContent=txt;bub.classList.remove('show');void bub.offsetWidth;bub.classList.add('show');
     };
+    const land=()=>{mv(null,0,0,.55);setTimeout(()=>{el.classList.add('jump');setTimeout(()=>{el.classList.remove('jump');busy=false},600)},550)};
+    const later=(f,ms,k)=>setTimeout(()=>{if(k===seq&&!drag)f()},ms);
+    el.addEventListener('pointerdown',e=>{drag=true;moved=false;busy=true;seq++;sx=e.clientX;sy=e.clientY;el.classList.add('drag');el.classList.remove('walk','climb','jump');el.style.transition='none';try{el.setPointerCapture(e.pointerId)}catch(x){}e.preventDefault()});
+    el.addEventListener('pointermove',e=>{
+      if(!drag)return;
+      if(Math.abs(e.clientX-sx)+Math.abs(e.clientY-sy)>6)moved=true;
+      if(!moved)return;
+      const r=L.getBoundingClientRect();
+      el.style.left=Math.max(0,Math.min(r.width-44,e.clientX-r.left-22))+'px';
+      el.style.bottom=Math.max(0,Math.min(r.height-50,r.bottom-e.clientY-24))+'px';
+    });
+    const up=()=>{if(!drag)return;drag=false;el.classList.remove('drag');if(moved)land();else{busy=false;say((S?S.names[p[1]]:'')+p[2])}};
+    el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
     (function go(){
-      const w=L.clientWidth;
-      if(w>100){
-        const x=8+Math.random()*(w-60),d=Math.abs(x-(parseFloat(el.style.left)||0)),t=Math.min(7,Math.max(1.5,d/35));
-        el.style.transitionDuration=t+'s';el.classList.add('walk');el.style.left=x+'px';
-        setTimeout(()=>el.classList.remove('walk'),t*1000);
+      const k=seq,w=L.clientWidth,h=L.clientHeight;
+      if(w>100&&!drag&&!busy){
+        busy=true;
+        if(Math.random()<.45&&h>220){
+          const ex=Math.random()<.5?2:w-46,top=80+Math.random()*Math.min(h-130,300),d=Math.abs(ex-(parseFloat(el.style.left)||0)),t=Math.min(6,Math.max(1.5,d/35));
+          el.classList.add('walk');mv(ex,0,t,.5);
+          later(()=>{el.classList.remove('walk');el.classList.add('climb');mv(null,top,0,3)},t*1000,k);
+          later(()=>{el.classList.remove('climb');say('Tepedeyim! 🏔️')},t*1000+3100,k);
+          later(()=>land(),t*1000+5200,k);
+        }else{
+          const x=8+Math.random()*(w-60),d=Math.abs(x-(parseFloat(el.style.left)||0)),t=Math.min(7,Math.max(1.5,d/35));
+          el.classList.add('walk');mv(x,0,t,.3);
+          later(()=>{el.classList.remove('walk');busy=false},t*1000,k);
+        }
       }
-      setTimeout(go,3500+Math.random()*5000);
+      setTimeout(go,4000+Math.random()*5000);
     })();
   });
 }
