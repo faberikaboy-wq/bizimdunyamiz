@@ -54,12 +54,41 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
 .chat-input input{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:8px;outline:none;font-size:.95rem}
 .chat-input button{background:var(--primary);color:#fff;border:none;padding:0 18px;border-radius:8px;font-weight:bold;cursor:pointer}
 .status{font-size:.75rem;color:var(--muted);text-align:center}
+
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,71,87,.55)}50%{box-shadow:0 0 0 9px rgba(255,71,87,0)}}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.1)}30%{transform:scale(1)}45%{transform:scale(1.07)}}
+@keyframes floatUp{0%{transform:translateY(0) scale(.7);opacity:0}15%{opacity:.85}100%{transform:translateY(-110vh) scale(1.2);opacity:0}}
+@keyframes shine{0%{background-position:0 50%}100%{background-position:200% 50%}}
+.content-area.active>*{animation:up .5s both}
+.content-area.active>*:nth-child(2){animation-delay:.05s}.content-area.active>*:nth-child(3){animation-delay:.1s}.content-area.active>*:nth-child(4){animation-delay:.15s}.content-area.active>*:nth-child(5){animation-delay:.2s}.content-area.active>*:nth-child(6){animation-delay:.25s}.content-area.active>*:nth-child(n+7){animation-delay:.3s}
+.card{transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,71,87,.16)}
+.btn,.small-btn,.chat-input button{transition:transform .15s,box-shadow .2s,opacity .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(255,71,87,.3)}
+.btn:active,.small-btn:active,.chat-input button:active{transform:scale(.94)}
+header{background:linear-gradient(90deg,#ff4757,#ff6b81,#ff4757);background-size:200% 100%;animation:shine 6s linear infinite}
+.bd{background-size:200% 100%}
+.bd .big{animation:beat 2.4s infinite;display:inline-block}
+.message{animation:pop .25s both}
+.alert{animation:pop .4s both,pulse 1.6s ease-out 3;border-left:5px solid var(--primary)}
+nav button{position:relative;transition:color .2s,border-color .2s,transform .15s}
+nav button:active{transform:scale(.92)}
+.dot{position:absolute;top:5px;right:18%;min-width:17px;height:17px;border-radius:9px;background:var(--primary);color:#fff;font-size:.65rem;font-style:normal;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px;animation:pulse 1.6s infinite}
+#login-screen>*:not(.hearts){position:relative;z-index:1}
+#login-screen{position:relative;overflow:hidden}
+.hearts{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hearts span{position:absolute;bottom:-40px;opacity:0;animation:floatUp linear infinite}
+.login-box{animation:pop .6s both}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="container">
 
 <div id="login-screen" class="screen active">
+  <div class="hearts" id="hearts"></div>
   <h1>❤️ Bizim Dünyamız</h1>
   <p>Devam etmek için şifreni gir</p>
   <div class="login-box">
@@ -71,7 +100,7 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
 </div>
 
 <div id="main-screen" class="screen">
-  <header><h2 id="welcome-title">Hoş Geldin ❤️</h2><button class="small-btn" id="logout-btn">Çıkış</button></header>
+  <header><h2 id="welcome-title">Hoş Geldin ❤️</h2><div style="display:flex;gap:8px;align-items:center"><button class="small-btn" id="bell-btn" style="position:relative" title="Bildirimler">🔔<i class="dot" id="bell-n" style="top:-7px;right:-7px"></i></button><button class="small-btn" id="logout-btn">Çıkış</button></div></header>
 
   <div id="tab-home" class="content-area active">
     <div id="period-alert"></div>
@@ -185,7 +214,7 @@ async function save(patch){
 
 const NTFY_BASE='hm-db172edccc83';
 function push(to,title,message){
-  try{fetch('https://ntfy.sh',{method:'POST',body:JSON.stringify({topic:NTFY_BASE+'-'+to,title:title,message:message})}).catch(()=>{})}catch(e){}
+  try{fetch('https://ntfy.sh',{method:'POST',body:JSON.stringify({topic:NTFY_BASE+'-'+to,title:title,message:message,click:location.origin+location.pathname})}).catch(()=>{})}catch(e){}
 }
 let swReg=null,lastMsgTs=null;
 function notify(title,body){
@@ -241,6 +270,27 @@ function renderMore(){
   const wk=S.week[wkey()]||{};if(document.activeElement!==$('wk-input'))$('wk-input').value=wk[me]||'';
   $('wk-other').textContent=(wk[o]&&wk[me])?n[o]+': '+wk[o]:wk[o]?n[o]+' yazdı. Görmek için sen de yaz 🙈':n[o]+' henüz yazmadı.';
   $('lang-sel').value=S.lang[me]||'';$('lang-other').textContent=S.lang[o]?n[o]+' için sevgi dili: '+S.lang[o]:'';
+}
+function seenKey(){return 'couple_seen_'+me}
+function getSeen(){try{return +localStorage.getItem(seenKey())||0}catch(e){return 0}}
+function markSeen(){try{const mx=msgs.reduce((a,m)=>Math.max(a,m.ts||0),0);if(mx)localStorage.setItem(seenKey(),mx)}catch(e){}}
+function updateBadges(){
+  if(!me||!S)return;
+  const chatOn=$('tab-chat').classList.contains('active');
+  if(chatOn)markSeen();
+  let seen=getSeen();
+  if(!seen&&msgs.length){markSeen();seen=getSeen()}
+  const unread=chatOn?0:msgs.filter(m=>m.sender!==me&&m.ts>seen).length;
+  const alerts=document.querySelectorAll('#tab-home .alert').length;
+  const set=(id,n)=>{const e=$(id);if(!e)return;e.textContent=n;e.style.display=n?'flex':'none'};
+  set('dot-home',alerts);set('dot-chat',unread);set('bell-n',alerts+unread);
+  document.title=(alerts+unread?'('+(alerts+unread)+') ':'')+'Bizim Dünyamız ❤️';
+}
+function goNotif(){
+  const unread=$('dot-chat').style.display==='flex';
+  const tab=document.querySelectorAll('#tab-home .alert').length||!unread?'home':'chat';
+  document.querySelector('nav button[data-tab='+tab+']').click();
+  const a=$('tab-home').querySelector('.alert');if(tab==='home'){$('tab-home').scrollTo({top:0,behavior:'smooth'})}
 }
 function tryLogin(){
   const v=$('password-input').value.trim();
@@ -344,7 +394,7 @@ function renderAll(){
   $('bd1-name').textContent=S.names.user1;$('bd2-name').textContent=S.names.user2;
   $('lbl-b1').textContent=S.names.user1+' doğum günü';$('lbl-b2').textContent=S.names.user2+' doğum günü';
   renderBday(1,S.bday.user1);renderBday(2,S.bday.user2);
-  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
+  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();updateBadges();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
   const act=document.activeElement;
   const setv=(id,v)=>{if(act!==$(id))$(id).value=v}
   setv('bday1',S.bday.user1);setv('bday2',S.bday.user2);
@@ -392,7 +442,7 @@ async function init(){
     if(me&&!$('main-screen').classList.contains('active'))enter();else renderAll();
   },e=>{$('load-status').textContent='Bağlantı hatası.'});
   db.collection('messages').orderBy('ts','desc').limit(100).onSnapshot(snap=>{
-    msgs=snap.docs.map(d=>d.data()).reverse();checkMsgNotify();renderMessages();
+    msgs=snap.docs.map(d=>d.data()).reverse();checkMsgNotify();renderMessages();updateBadges();
   },e=>{$('chat-status').textContent='Mesajlar yüklenemedi.'});
 }
 
@@ -405,7 +455,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.content-area').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
   $('tab-'+b.dataset.tab).classList.add('active');b.classList.add('active');
-  if(b.dataset.tab==='chat'){const c=$('chat-messages');c.scrollTop=c.scrollHeight}
+  if(b.dataset.tab==='chat'){const c=$('chat-messages');c.scrollTop=c.scrollHeight;markSeen()}updateBadges();
 });
 $('bday1').onchange=e=>save({bday:{user1:e.target.value}});
 $('bday2').onchange=e=>save({bday:{user2:e.target.value}});
@@ -427,6 +477,10 @@ $('th-save').onclick=()=>{const v=$('th-input').value.trim();if(!v)return;save({
 $('wk-save').onclick=()=>{const v=$('wk-input').value.trim();if(!v)return;save({week:{[wkey()]:{[me]:v}}});push(other(),'📝 '+S.names[me],'Haftalık check-in yazdı')};
 $('idea-btn').onclick=()=>{$('idea-text').textContent=IDEAS[Math.floor(Math.random()*IDEAS.length)]};
 $('lang-sel').onchange=e=>save({lang:{[me]:e.target.value}});
+document.querySelector('nav button[data-tab=home]').insertAdjacentHTML('beforeend','<i class="dot" id="dot-home"></i>');
+document.querySelector('nav button[data-tab=chat]').insertAdjacentHTML('beforeend','<i class="dot" id="dot-chat"></i>');
+$('bell-btn').onclick=goNotif;
+(function(){const h=$('hearts'),E=['❤️','💗','💕','💖'];for(let i=0;i<16;i++){const x=document.createElement('span');x.textContent=E[i%4];x.style.left=(Math.random()*95)+'%';x.style.fontSize=(14+Math.random()*22)+'px';x.style.animationDuration=(7+Math.random()*8)+'s';x.style.animationDelay=(Math.random()*8)+'s';h.appendChild(x)}})();
 buildBtns();
 init();
 </script>
