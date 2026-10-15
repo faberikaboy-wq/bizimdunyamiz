@@ -82,6 +82,18 @@ nav button:active{transform:scale(.92)}
 .hearts span{position:absolute;bottom:-40px;opacity:0;animation:floatUp linear infinite}
 .login-box{animation:pop .6s both}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes bigjump{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-22px) rotate(-12deg)}70%{transform:translateY(-8px) rotate(8deg)}}
+@keyframes bubble{0%{opacity:0;transform:scale(.7)}12%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.9)}}
+.container{position:relative}
+.pets{position:absolute;left:0;right:0;bottom:50px;height:52px;pointer-events:none;z-index:6}
+.pet{position:absolute;bottom:0;width:44px;text-align:center;pointer-events:auto;cursor:pointer;transition:left 4s ease-in-out}
+.pet .body{font-size:30px;line-height:34px;display:inline-block}
+.pet small{display:block;font-size:.55rem;color:var(--muted);margin-top:-2px}
+.pet.walk .body{animation:hop .35s infinite}
+.pet.jump .body{animation:bigjump .6s}
+.bub{position:absolute;bottom:100%;width:130px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:5px 7px;font-size:.68rem;opacity:0;pointer-events:none;text-align:center}
+.bub.show{animation:bubble 2.4s both}
 </style>
 </head>
 <body>
@@ -184,6 +196,7 @@ nav button:active{transform:scale(.92)}
     </div>
   </div>
 
+  <div class="pets" id="pets"></div>
   <nav>
     <button class="active" data-tab="home">Ana Sayfa</button>
     <button data-tab="chat">Sohbet</button>
@@ -292,6 +305,38 @@ function goNotif(){
   document.querySelector('nav button[data-tab='+tab+']').click();
   const a=$('tab-home').querySelector('.alert');if(tab==='home'){$('tab-home').scrollTo({top:0,behavior:'smooth'})}
 }
+let petsOn=false;
+function updatePets(){
+  const L=$('pets');if(!L)return;
+  L.style.display=($('tab-chat').classList.contains('active')||$('tab-settings').classList.contains('active'))?'none':'block';
+  L.querySelectorAll('.pet').forEach(el=>{el.style.display=(el.dataset.u===me)?'none':''});
+  if(S)L.querySelectorAll('.pet').forEach(el=>{el.querySelector('small').textContent=S.names[el.dataset.u]});
+}
+function startPets(){
+  if(petsOn)return;petsOn=true;
+  const L=$('pets');
+  [['🐼','user1',' seni çok seviyor 🐼💗'],['🐰','user2',' seni çok seviyor 🐰💗']].forEach((p,i)=>{
+    const el=document.createElement('div');el.className='pet';el.dataset.u=p[1];
+    el.innerHTML='<div class="bub"></div><div class="body"></div><small></small>';
+    el.querySelector('.body').textContent=p[0];el.style.left=(30+i*140)+'px';L.appendChild(el);
+    const bub=el.querySelector('.bub');
+    el.onclick=()=>{
+      const w=L.clientWidth,pl=parseFloat(el.style.left)||0,bl=Math.max(4,Math.min(w-134,pl+22-65));
+      bub.style.left=(bl-pl)+'px';bub.textContent=(S?S.names[p[1]]:'')+p[2];
+      bub.classList.remove('show');void bub.offsetWidth;bub.classList.add('show');
+      el.classList.add('jump');setTimeout(()=>el.classList.remove('jump'),600);
+    };
+    (function go(){
+      const w=L.clientWidth;
+      if(w>100){
+        const x=8+Math.random()*(w-60),d=Math.abs(x-(parseFloat(el.style.left)||0)),t=Math.min(7,Math.max(1.5,d/35));
+        el.style.transitionDuration=t+'s';el.classList.add('walk');el.style.left=x+'px';
+        setTimeout(()=>el.classList.remove('walk'),t*1000);
+      }
+      setTimeout(go,3500+Math.random()*5000);
+    })();
+  });
+}
 function tryLogin(){
   const v=$('password-input').value.trim();
   if(!S)return;
@@ -394,7 +439,7 @@ function renderAll(){
   $('bd1-name').textContent=S.names.user1;$('bd2-name').textContent=S.names.user2;
   $('lbl-b1').textContent=S.names.user1+' doğum günü';$('lbl-b2').textContent=S.names.user2+' doğum günü';
   renderBday(1,S.bday.user1);renderBday(2,S.bday.user2);
-  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();updateBadges();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
+  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();updateBadges();startPets();updatePets();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
   const act=document.activeElement;
   const setv=(id,v)=>{if(act!==$(id))$(id).value=v}
   setv('bday1',S.bday.user1);setv('bday2',S.bday.user2);
@@ -455,7 +500,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.content-area').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
   $('tab-'+b.dataset.tab).classList.add('active');b.classList.add('active');
-  if(b.dataset.tab==='chat'){const c=$('chat-messages');c.scrollTop=c.scrollHeight;markSeen()}updateBadges();
+  if(b.dataset.tab==='chat'){const c=$('chat-messages');c.scrollTop=c.scrollHeight;markSeen()}updateBadges();updatePets();
 });
 $('bday1').onchange=e=>save({bday:{user1:e.target.value}});
 $('bday2').onchange=e=>save({bday:{user2:e.target.value}});
