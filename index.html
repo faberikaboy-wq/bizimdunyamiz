@@ -142,8 +142,14 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
 </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-const DEFAULTS={names:{user1:"Sen",user2:"Sevgilin"},pass:{user1:"1453",user2:"1903"},bday:{user1:"",user2:""},period:{last:"",cycle:28,len:5,startedAt:0,ack:0,endedAt:0,endAck:0},miss:{user1:0,user2:0},missAck:{user1:0,user2:0},qa:{},mood:{user1:{bad:false,ts:0},user2:{bad:false,ts:0}}};
+// Firebase konsolundan aldığın ayarları buraya yapıştır
+const FIREBASE_CONFIG={apiKey:'BURAYA',authDomain:'',projectId:'',storageBucket:'',messagingSenderId:'',appId:''};
+</script>
+<script>
+const DEFAULTS={names:{user1:"Hipoş",user2:"Medoş"},pass:{user1:"1453",user2:"1903"},bday:{user1:"",user2:""},period:{last:"",cycle:28,len:5,startedAt:0,ack:0,endedAt:0,endAck:0},miss:{user1:0,user2:0},missAck:{user1:0,user2:0},qa:{},mood:{user1:{bad:false,ts:0},user2:{bad:false,ts:0}}};
 let db=null,S=null,me=null,msgs=[];
 const $=id=>document.getElementById(id);
 const other=()=>me==='user1'?'user2':'user1';
@@ -289,8 +295,11 @@ async function sendMessage(){
 }
 
 async function init(){
-  try{db=await claude.use('db')}catch(e){db=null}
-  if(!db){$('load-status').textContent='Bağlantı kurulamadı. Sayfayı claude.ai hesabınla açman gerekiyor.';return}
+  try{
+    if(FIREBASE_CONFIG.apiKey==='BURAYA'){db=null}
+    else{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}
+  }catch(e){console.error(e);db=null}
+  if(!db){$('load-status').textContent='Bağlantı kurulamadı. Firebase ayarlarını (FIREBASE_CONFIG) kontrol et.';return}
   let first=true;
   db.doc('app/settings').onSnapshot(snap=>{
     if(!snap.exists){
