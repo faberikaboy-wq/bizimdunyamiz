@@ -121,9 +121,9 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
     </div>
     <div class="card">
       <h4>🔔 Bildirimler</h4>
-      <p class="sub">Yeni mesaj, moral, seni düşünüyorum ve regl bildirimleri telefonuna gelsin.</p>
-      <button class="btn" style="margin-top:10px" id="notif-btn">Bildirimleri aç</button>
-      <p id="notif-msg" class="sub" style="margin-top:8px"></p>
+      <p class="sub">Telefona <b>ntfy</b> uygulamasını kur (ücretsiz), içinde <b>+</b> tuşuna basıp şu adı yaz:</p>
+      <p style="margin-top:8px"><code id="ntfy-topic" style="font-weight:700;word-break:break-all"></code></p>
+      <p class="sub" style="margin-top:8px">Böylece uygulama kapalıyken bile bildirim üstten gelir.</p>
     </div>
     <div class="card">
       <h4>İsimler</h4>
@@ -167,8 +167,13 @@ async function save(patch){
   catch(e){alert('Kaydedilemedi: '+(e.message||e.code))}
 }
 
+const NTFY_BASE='hm-db172edccc83';
+function push(to,title,message){
+  try{fetch('https://ntfy.sh',{method:'POST',body:JSON.stringify({topic:NTFY_BASE+'-'+to,title:title,message:message})}).catch(()=>{})}catch(e){}
+}
 let swReg=null,lastMsgTs=null;
 function notify(title,body){
+  return;
   try{
     if(!('Notification' in window)||Notification.permission!=='granted'||!document.hidden)return;
     if(swReg&&swReg.showNotification)swReg.showNotification(title,{body:body,tag:title,renotify:true});
@@ -291,7 +296,7 @@ function renderAll(){
   $('bd1-name').textContent=S.names.user1;$('bd2-name').textContent=S.names.user2;
   $('lbl-b1').textContent=S.names.user1+' doğum günü';$('lbl-b2').textContent=S.names.user2+' doğum günü';
   renderBday(1,S.bday.user1);renderBday(2,S.bday.user2);
-  renderPeriod();renderMood();renderRoleUI();renderExtras();
+  renderPeriod();renderMood();renderRoleUI();renderExtras();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
   const act=document.activeElement;
   const setv=(id,v)=>{if(act!==$(id))$(id).value=v}
   setv('bday1',S.bday.user1);setv('bday2',S.bday.user2);
@@ -317,7 +322,7 @@ function renderMessages(){
 async function sendMessage(){
   const i=$('message-input');const text=i.value.trim();if(!text||!db)return;
   i.value='';
-  try{await db.collection('messages').add({sender:me,text,ts:Date.now()});$('chat-status').textContent=''}
+  try{await db.collection('messages').add({sender:me,text,ts:Date.now()});push(other(),'💬 '+S.names[me],text);$('chat-status').textContent=''}
   catch(e){i.value=text;$('chat-status').textContent='Mesaj gönderilemedi, tekrar dene.'}
 }
 
@@ -356,25 +361,18 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 $('bday1').onchange=e=>save({bday:{user1:e.target.value}});
 $('bday2').onchange=e=>save({bday:{user2:e.target.value}});
 $('p-save').onclick=()=>save({period:{last:$('p-last').value,cycle:+$('p-cycle').value||28,len:+$('p-len').value||5}});
-$('period-today').onclick=()=>{const t=new Date();const s=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');save({period:{last:s,startedAt:Date.now()}})};
+$('period-today').onclick=()=>{const t=new Date();const s=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');save({period:{last:s,startedAt:Date.now()}});push('user1','🩸 '+S.names.user2,'Regl oldu, ona iyi davran 🤍')};
 $('names-save').onclick=()=>save({names:{user1:$('name1').value.trim()||'Sen',user2:$('name2').value.trim()||'Sevgilin'}});
-$('mood-btn').onclick=()=>{const bad=!(S.mood[me]&&S.mood[me].bad);save({mood:{[me]:{bad,ts:Date.now()}}})};
+$('mood-btn').onclick=()=>{const bad=!(S.mood[me]&&S.mood[me].bad);save({mood:{[me]:{bad,ts:Date.now()}}});if(bad)push(other(),'💔 '+S.names[me],'Moralin bozuk olduğunu bildirdi')};
 $('pass-save').onclick=()=>{
   const m=$('pass-msg'),o=$('old-pass').value.trim(),n=$('new-pass').value.trim();
   if(o!==S.pass[me]){m.textContent='Mevcut şifre yanlış!';return}
   if(n.length<3){m.textContent='Yeni şifre en az 3 karakter olmalı!';return}
   save({pass:{[me]:n}});m.textContent='Şifre güncellendi 🎉';$('old-pass').value='';$('new-pass').value='';
 };
-$('period-end').onclick=()=>save({period:{endedAt:Date.now()}});
-$('miss-btn').onclick=()=>save({miss:{[me]:Date.now()}});
+$('period-end').onclick=()=>{save({period:{endedAt:Date.now()}});push('user1','✅ '+S.names.user2,'Regl dönemi bitti 🎉')};
+$('miss-btn').onclick=()=>{save({miss:{[me]:Date.now()}});push(other(),'💗 '+S.names[me],'Seni düşünüyor')};
 $('dq-save').onclick=()=>{const n=new Date(),dk=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();const v=$('dq-input').value.trim();if(v)save({qa:{[dk]:{[me]:v}}})};
-$('notif-btn').onclick=async()=>{
-  const m=$('notif-msg');
-  if(!('Notification' in window)){m.textContent='Bu tarayıcı bildirimi desteklemiyor. iPhone için siteyi önce Ana Ekrana ekle.';return}
-  try{if('serviceWorker' in navigator)swReg=await navigator.serviceWorker.register('sw.js')}catch(e){}
-  const r=await Notification.requestPermission();
-  m.textContent=r==='granted'?'Bildirimler açık ✅':'İzin verilmedi.';
-};
 if('serviceWorker' in navigator&&window.Notification&&Notification.permission==='granted')navigator.serviceWorker.register('sw.js').then(r=>{swReg=r}).catch(()=>{});
 init();
 </script>
