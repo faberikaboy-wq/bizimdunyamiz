@@ -120,6 +120,12 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
       <button class="btn" style="margin-top:10px" id="p-save">Kaydet</button>
     </div>
     <div class="card">
+      <h4>🔔 Bildirimler</h4>
+      <p class="sub">Yeni mesaj, moral, seni düşünüyorum ve regl bildirimleri telefonuna gelsin.</p>
+      <button class="btn" style="margin-top:10px" id="notif-btn">Bildirimleri aç</button>
+      <p id="notif-msg" class="sub" style="margin-top:8px"></p>
+    </div>
+    <div class="card">
       <h4>İsimler</h4>
       <label class="l">Senin adın</label><input class="field" id="name1">
       <label class="l">Sevgilinin adı</label><input class="field" id="name2">
@@ -157,11 +163,32 @@ try{me=localStorage.getItem('couple_me')||null}catch(e){}
 
 function merge(d,s){const o=JSON.parse(JSON.stringify(d));for(const k in (s||{})){if(o[k]&&typeof o[k]==='object'&&!Array.isArray(o[k])&&typeof s[k]==='object')o[k]=merge(o[k],s[k]);else o[k]=s[k]}return o}
 async function save(patch){
-  try{await db.doc('app/settings').update(patch)}catch(e){
-    try{await db.doc('app/settings').set(merge(S||DEFAULTS,patch))}catch(e2){alert('Kaydedilemedi: '+(e2.message||e2.code))}
-  }
+  try{await db.doc('app/settings').set(patch,{merge:true})}
+  catch(e){alert('Kaydedilemedi: '+(e.message||e.code))}
 }
 
+let swReg=null,lastMsgTs=null;
+function notify(title,body){
+  try{
+    if(!('Notification' in window)||Notification.permission!=='granted'||!document.hidden)return;
+    if(swReg&&swReg.showNotification)swReg.showNotification(title,{body:body,tag:title,renotify:true});
+    else new Notification(title,{body:body});
+  }catch(e){}
+}
+function checkMsgNotify(){
+  const mx=msgs.reduce((a,m)=>Math.max(a,m.ts||0),0);
+  if(lastMsgTs!==null&&me&&S)msgs.filter(m=>m.sender!==me&&m.ts>lastMsgTs).forEach(m=>notify('💬 '+S.names[m.sender],m.text));
+  lastMsgTs=mx;
+}
+function checkSettingsNotify(p,n){
+  if(!p||!me)return;const o=other();
+  if(n.mood[o].bad&&!p.mood[o].bad)notify('💔 '+n.names[o],'Moralin bozuk olduğunu bildirdi');
+  if((n.miss[o]||0)>(p.miss[o]||0))notify('💗 '+n.names[o],'Seni düşünüyor');
+  if(me==='user1'){
+    if((n.period.startedAt||0)>(p.period.startedAt||0))notify('🩸 '+n.names.user2,'Regl oldu, ona iyi davran');
+    if((n.period.endedAt||0)>(p.period.endedAt||0))notify('✅ '+n.names.user2,'Regl dönemi bitti 🎉');
+  }
+}
 function tryLogin(){
   const v=$('password-input').value.trim();
   if(!S)return;
@@ -306,12 +333,12 @@ async function init(){
       if(first){first=false;db.doc('app/settings').set(DEFAULTS).catch(()=>{});S=merge(DEFAULTS,{});$('load-status').textContent='';}
       return;
     }
-    first=false;S=merge(DEFAULTS,snap.data());
+    first=false;const prevS=S;S=merge(DEFAULTS,snap.data());checkSettingsNotify(prevS,S);
     $('load-status').textContent='';
     if(me&&!$('main-screen').classList.contains('active'))enter();else renderAll();
   },e=>{$('load-status').textContent='Bağlantı hatası.'});
   db.collection('messages').orderBy('ts','desc').limit(100).onSnapshot(snap=>{
-    msgs=snap.docs.map(d=>d.data()).reverse();renderMessages();
+    msgs=snap.docs.map(d=>d.data()).reverse();checkMsgNotify();renderMessages();
   },e=>{$('chat-status').textContent='Mesajlar yüklenemedi.'});
 }
 
@@ -341,6 +368,14 @@ $('pass-save').onclick=()=>{
 $('period-end').onclick=()=>save({period:{endedAt:Date.now()}});
 $('miss-btn').onclick=()=>save({miss:{[me]:Date.now()}});
 $('dq-save').onclick=()=>{const n=new Date(),dk=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();const v=$('dq-input').value.trim();if(v)save({qa:{[dk]:{[me]:v}}})};
+$('notif-btn').onclick=async()=>{
+  const m=$('notif-msg');
+  if(!('Notification' in window)){m.textContent='Bu tarayıcı bildirimi desteklemiyor. iPhone için siteyi önce Ana Ekrana ekle.';return}
+  try{if('serviceWorker' in navigator)swReg=await navigator.serviceWorker.register('sw.js')}catch(e){}
+  const r=await Notification.requestPermission();
+  m.textContent=r==='granted'?'Bildirimler açık ✅':'İzin verilmedi.';
+};
+if('serviceWorker' in navigator&&window.Notification&&Notification.permission==='granted')navigator.serviceWorker.register('sw.js').then(r=>{swReg=r}).catch(()=>{});
 init();
 </script>
 </body>
