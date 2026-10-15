@@ -268,15 +268,18 @@ function buildBtns(){
   const sb=$('sig-btns');SIGS.forEach(x=>{const b=document.createElement('button');b.className='btn alt';b.textContent=x[0];b.onclick=()=>{save({sig:{[me]:{text:x[1],ts:Date.now()}}});push(other(),'🕊️ '+S.names[me],x[1])};sb.appendChild(b)});
   const fb=$('feel-btns');FEELS.forEach(e=>{const b=document.createElement('button');b.className='btn alt';b.style.fontSize='1.4rem';b.textContent=e;b.onclick=()=>save({feel:{[me]:{e:e,ts:Date.now()}}});fb.appendChild(b)});
 }
+const listDraw={};
 function makeList(coll,listId,inputId,btnId,check){
-  const box=$(listId);
-  db.collection(coll).orderBy('ts','desc').limit(100).onSnapshot(snap=>{
+  const box=$(listId);let docs=[];
+  const draw=()=>{
     box.innerHTML='';
-    snap.docs.forEach(d=>{const x=d.data(),row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)';
+    docs.forEach(d=>{const x=d.data(),row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)';
       if(check){const c=document.createElement('input');c.type='checkbox';c.checked=!!x.done;c.onchange=()=>db.collection(coll).doc(d.id).set({done:c.checked},{merge:true});row.appendChild(c)}
       const t=document.createElement('span');t.style.flex='1';t.textContent=x.text+(S?' · '+S.names[x.by]:'');if(x.done)t.style.textDecoration='line-through';row.appendChild(t);
       const del=document.createElement('button');del.textContent='✕';del.style.cssText='background:none;border:none;color:var(--muted);cursor:pointer';del.onclick=()=>db.collection(coll).doc(d.id).delete();row.appendChild(del);box.appendChild(row)});
-  });
+  };
+  listDraw[coll]=draw;
+  db.collection(coll).orderBy('ts','desc').limit(100).onSnapshot(snap=>{docs=snap.docs;draw()});
   $(btnId).onclick=()=>{const v=$(inputId).value.trim();if(!v||!me)return;$(inputId).value='';db.collection(coll).add({text:v,by:me,ts:Date.now(),done:false});push(other(),(check?'⭐ ':'📸 ')+S.names[me],(check?'Hayal listesine ekledi: ':'Anı defterine yazdı: ')+v)};
 }
 function renderMore(){
@@ -468,7 +471,7 @@ function renderAll(){
   $('bd1-name').textContent=S.names.user1;$('bd2-name').textContent=S.names.user2;
   $('lbl-b1').textContent=S.names.user1+' doğum günü';$('lbl-b2').textContent=S.names.user2+' doğum günü';
   renderBday(1,S.bday.user1);renderBday(2,S.bday.user2);
-  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();updateBadges();startPets();updatePets();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
+  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();updateBadges();startPets();updatePets();Object.values(listDraw).forEach(f=>f());$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
   const act=document.activeElement;
   const setv=(id,v)=>{if(act!==$(id))$(id).value=v}
   setv('bday1',S.bday.user1);setv('bday2',S.bday.user2);
