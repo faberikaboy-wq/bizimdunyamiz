@@ -76,6 +76,7 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
   <div id="tab-home" class="content-area active">
     <div id="period-alert"></div>
     <div id="miss-alert"></div>
+    <div id="sig-alert"></div>
     <div id="partner-mood"></div>
     <div class="grid2">
       <div class="card bd"><h4 id="bd1-name">Sen</h4><div class="big" id="bd1-days">–</div><div class="sub" id="bd1-sub">doğum günü</div></div>
@@ -89,6 +90,11 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
       <button class="btn alt" style="margin-top:8px" id="period-end">Regl bitti ✅</button>
     </div>
     <div class="card"><h4>💗 Seni Düşünüyorum</h4><div class="sub" style="margin-bottom:8px">Tek dokunuşla karşındakine haber ver.</div><button class="btn" id="miss-btn">Seni düşünüyorum 💗</button></div>
+    <div class="card"><h4>🕊️ Bir şey söylemek istiyorum</h4><div id="sig-btns" style="display:flex;flex-direction:column;gap:8px"></div></div>
+    <div class="card"><h4>🙂 Bugün nasılsın?</h4><div id="feel-btns" style="display:flex;gap:8px;justify-content:space-between"></div><div id="feel-other" class="sub" style="margin-top:8px"></div></div>
+    <div class="card"><h4>🙏 Teşekkür Notu</h4><div class="sub" style="margin-bottom:6px">Bugün sana teşekkür ederim çünkü…</div><textarea class="field" id="th-input" rows="2"></textarea><button class="btn" style="margin-top:8px" id="th-save">Gönder</button><div id="th-other" class="sub" style="margin-top:8px"></div></div>
+    <div class="card"><h4>📝 Haftalık Check-in</h4><div class="sub" style="margin-bottom:6px">Bu hafta ne iyi gitti? Neye ihtiyacın var? Haftaya ne yapalım?</div><textarea class="field" id="wk-input" rows="3"></textarea><button class="btn" style="margin-top:8px" id="wk-save">Kaydet</button><div id="wk-other" class="sub" style="margin-top:8px"></div></div>
+    <div class="card"><h4>🎲 Randevu Fikri</h4><div id="idea-text" style="font-weight:600;margin-bottom:8px">Bu akşam ne yapalım?</div><button class="btn alt" id="idea-btn">Bana fikir ver</button></div>
     <div class="card"><h4>💬 Günün Sorusu</h4><div id="dq-text" style="font-weight:600;margin-bottom:8px"></div><textarea class="field" id="dq-input" rows="2" placeholder="Cevabın..."></textarea><button class="btn" style="margin-top:8px" id="dq-save">Cevabı Kaydet</button><div id="dq-other" class="sub" style="margin-top:8px"></div></div>
     <div class="card">
       <h4>Moral Durumum</h4>
@@ -106,6 +112,10 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
     </div>
   </div>
 
+  <div id="tab-shared" class="content-area">
+    <div class="card"><h4>⭐ Hayal Listemiz</h4><div class="chat-input"><input id="bk-input" placeholder="Birlikte yapmak istediğin şey..."><button id="bk-add">Ekle</button></div><div id="bk-list" style="margin-top:8px"></div></div>
+    <div class="card"><h4>📸 Anı Defterimiz</h4><div class="chat-input"><input id="mm-input" placeholder="Unutmak istemediğin bir an..."><button id="mm-add">Ekle</button></div><div id="mm-list" style="margin-top:8px"></div></div>
+  </div>
   <div id="tab-settings" class="content-area">
     <div class="card">
       <h4>Doğum Günleri</h4>
@@ -126,6 +136,11 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
       <p class="sub" style="margin-top:8px">Böylece uygulama kapalıyken bile bildirim üstten gelir.</p>
     </div>
     <div class="card">
+      <h4>💞 Sevgi Dilim</h4>
+      <select class="field" id="lang-sel"><option value="">Seç…</option><option>Onaylayıcı sözler</option><option>Kaliteli zaman</option><option>Hediye almak</option><option>Yardım etmek</option><option>Fiziksel temas</option></select>
+      <p id="lang-other" class="sub" style="margin-top:8px"></p>
+    </div>
+    <div class="card">
       <h4>İsimler</h4>
       <label class="l">Senin adın</label><input class="field" id="name1">
       <label class="l">Sevgilinin adı</label><input class="field" id="name2">
@@ -143,6 +158,7 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
   <nav>
     <button class="active" data-tab="home">Ana Sayfa</button>
     <button data-tab="chat">Sohbet</button>
+    <button data-tab="shared">Ortak</button>
     <button data-tab="settings">Ayarlar</button>
   </nav>
 </div>
@@ -155,7 +171,7 @@ label.l{font-size:.8rem;color:var(--muted);display:block;margin-top:8px}
 const FIREBASE_CONFIG={apiKey:'AIzaSyCBGX1kR7IUyo_-Oq6oIb9HNkbrbb7T8Ck',authDomain:'mesaj-uygulamasi-8b5c8.firebaseapp.com',projectId:'mesaj-uygulamasi-8b5c8',storageBucket:'mesaj-uygulamasi-8b5c8.firebasestorage.app',messagingSenderId:'451889654200',appId:'1:451889654200:web:1b61bfda416506993b074d'};
 </script>
 <script>
-const DEFAULTS={names:{user1:"Hipoş",user2:"Medoş"},pass:{user1:"1453",user2:"1903"},bday:{user1:"",user2:""},period:{last:"",cycle:28,len:5,startedAt:0,ack:0,endedAt:0,endAck:0},miss:{user1:0,user2:0},missAck:{user1:0,user2:0},qa:{},mood:{user1:{bad:false,ts:0},user2:{bad:false,ts:0}}};
+const DEFAULTS={names:{user1:"Hipoş",user2:"Medoş"},pass:{user1:"1453",user2:"1903"},bday:{user1:"",user2:""},period:{last:"",cycle:28,len:5,startedAt:0,ack:0,endedAt:0,endAck:0},miss:{user1:0,user2:0},missAck:{user1:0,user2:0},qa:{},sig:{user1:{text:'',ts:0},user2:{text:'',ts:0}},sigAck:{user1:0,user2:0},feel:{user1:{e:'',ts:0},user2:{e:'',ts:0}},thanks:{},week:{},lang:{user1:'',user2:''},mood:{user1:{bad:false,ts:0},user2:{bad:false,ts:0}}};
 let db=null,S=null,me=null,msgs=[];
 const $=id=>document.getElementById(id);
 const other=()=>me==='user1'?'user2':'user1';
@@ -193,6 +209,38 @@ function checkSettingsNotify(p,n){
     if((n.period.startedAt||0)>(p.period.startedAt||0))notify('🩸 '+n.names.user2,'Regl oldu, ona iyi davran');
     if((n.period.endedAt||0)>(p.period.endedAt||0))notify('✅ '+n.names.user2,'Regl dönemi bitti 🎉');
   }
+}
+function mkA(box,text,bt,fn){const d=document.createElement('div');d.className='alert';d.appendChild(document.createTextNode(text));const b=document.createElement('button');b.className='btn alt';b.style.marginTop='8px';b.textContent=bt;b.onclick=fn;d.appendChild(b);box.appendChild(d)}
+function dkey(){const n=new Date();return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()}
+function wkey(){const n=new Date(),k=(n.getDay()+6)%7,m=new Date(n.getFullYear(),n.getMonth(),n.getDate()-k);return 'w'+m.getFullYear()+'-'+(m.getMonth()+1)+'-'+m.getDate()}
+const IDEAS=['Birlikte yemek yapalım 🍝','Film gecesi, telefonlar kapalı 🎬','Akşam yürüyüşü ve çay ☕','Eski fotoğraflara bakalım 📸','Birbirimize mektup yazalım ✉️','Yeni bir tarif deneyelim 🍰','Oyun gecesi 🎲','Gün batımını izleyelim 🌇','Birbirimize 3 şey öğretelim 📚','Hayal listemizden birini seçelim ⭐','Birlikte müzik listesi yapalım 🎧','Sürpriz küçük bir hediye alalım 🎁'];
+const SIGS=[['💬 Konuşmak istiyorum','Seninle konuşmak istiyor'],['🌿 Biraz alana ihtiyacım var, kızgın değilim','Biraz alana ihtiyacı var ama kızgın değil'],['🕊️ Özür dilerim, barışalım mı?','Özür diliyor ve barışmak istiyor']];
+const FEELS=['😄','🙂','😐','😔','😡'];
+function buildBtns(){
+  const sb=$('sig-btns');SIGS.forEach(x=>{const b=document.createElement('button');b.className='btn alt';b.textContent=x[0];b.onclick=()=>{save({sig:{[me]:{text:x[1],ts:Date.now()}}});push(other(),'🕊️ '+S.names[me],x[1])};sb.appendChild(b)});
+  const fb=$('feel-btns');FEELS.forEach(e=>{const b=document.createElement('button');b.className='btn alt';b.style.fontSize='1.4rem';b.textContent=e;b.onclick=()=>save({feel:{[me]:{e:e,ts:Date.now()}}});fb.appendChild(b)});
+}
+function makeList(coll,listId,inputId,btnId,check){
+  const box=$(listId);
+  db.collection(coll).orderBy('ts','desc').limit(100).onSnapshot(snap=>{
+    box.innerHTML='';
+    snap.docs.forEach(d=>{const x=d.data(),row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)';
+      if(check){const c=document.createElement('input');c.type='checkbox';c.checked=!!x.done;c.onchange=()=>db.collection(coll).doc(d.id).set({done:c.checked},{merge:true});row.appendChild(c)}
+      const t=document.createElement('span');t.style.flex='1';t.textContent=x.text+(S?' · '+S.names[x.by]:'');if(x.done)t.style.textDecoration='line-through';row.appendChild(t);
+      const del=document.createElement('button');del.textContent='✕';del.style.cssText='background:none;border:none;color:var(--muted);cursor:pointer';del.onclick=()=>db.collection(coll).doc(d.id).delete();row.appendChild(del);box.appendChild(row)});
+  });
+  $(btnId).onclick=()=>{const v=$(inputId).value.trim();if(!v||!me)return;$(inputId).value='';db.collection(coll).add({text:v,by:me,ts:Date.now(),done:false});push(other(),(check?'⭐ ':'📸 ')+S.names[me],(check?'Hayal listesine ekledi: ':'Anı defterine yazdı: ')+v)};
+}
+function renderMore(){
+  const o=other(),n=S.names,today=ts=>new Date(ts).toDateString()===new Date().toDateString();
+  const sb=$('sig-alert');sb.innerHTML='';const sg=S.sig[o];
+  if(sg&&sg.ts>(S.sigAck[me]||0))mkA(sb,'🕊️ '+n[o]+': '+sg.text,'Gördüm',()=>save({sigAck:{[me]:Date.now()}}));
+  const f=S.feel[o];$('feel-other').textContent=(f&&f.e&&today(f.ts))?n[o]+' bugün: '+f.e:n[o]+' henüz paylaşmadı.';
+  const th=S.thanks[dkey()]||{};if(document.activeElement!==$('th-input'))$('th-input').value=th[me]||'';
+  $('th-other').textContent=th[o]?'🙏 '+n[o]+': '+th[o]:'';
+  const wk=S.week[wkey()]||{};if(document.activeElement!==$('wk-input'))$('wk-input').value=wk[me]||'';
+  $('wk-other').textContent=(wk[o]&&wk[me])?n[o]+': '+wk[o]:wk[o]?n[o]+' yazdı. Görmek için sen de yaz 🙈':n[o]+' henüz yazmadı.';
+  $('lang-sel').value=S.lang[me]||'';$('lang-other').textContent=S.lang[o]?n[o]+' için sevgi dili: '+S.lang[o]:'';
 }
 function tryLogin(){
   const v=$('password-input').value.trim();
@@ -296,7 +344,7 @@ function renderAll(){
   $('bd1-name').textContent=S.names.user1;$('bd2-name').textContent=S.names.user2;
   $('lbl-b1').textContent=S.names.user1+' doğum günü';$('lbl-b2').textContent=S.names.user2+' doğum günü';
   renderBday(1,S.bday.user1);renderBday(2,S.bday.user2);
-  renderPeriod();renderMood();renderRoleUI();renderExtras();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
+  renderPeriod();renderMood();renderRoleUI();renderExtras();renderMore();$('ntfy-topic').textContent=NTFY_BASE+'-'+me;
   const act=document.activeElement;
   const setv=(id,v)=>{if(act!==$(id))$(id).value=v}
   setv('bday1',S.bday.user1);setv('bday2',S.bday.user2);
@@ -332,6 +380,7 @@ async function init(){
     else{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}
   }catch(e){console.error(e);db=null}
   if(!db){$('load-status').textContent='Bağlantı kurulamadı. Firebase ayarlarını (FIREBASE_CONFIG) kontrol et.';return}
+  makeList('bucket','bk-list','bk-input','bk-add',true);makeList('memories','mm-list','mm-input','mm-add',false);
   let first=true;
   db.doc('app/settings').onSnapshot(snap=>{
     if(!snap.exists){
@@ -374,6 +423,11 @@ $('period-end').onclick=()=>{save({period:{endedAt:Date.now()}});push('user1','�
 $('miss-btn').onclick=()=>{save({miss:{[me]:Date.now()}});push(other(),'💗 '+S.names[me],'Seni düşünüyor')};
 $('dq-save').onclick=()=>{const n=new Date(),dk=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();const v=$('dq-input').value.trim();if(v)save({qa:{[dk]:{[me]:v}}})};
 if('serviceWorker' in navigator&&window.Notification&&Notification.permission==='granted')navigator.serviceWorker.register('sw.js').then(r=>{swReg=r}).catch(()=>{});
+$('th-save').onclick=()=>{const v=$('th-input').value.trim();if(!v)return;save({thanks:{[dkey()]:{[me]:v}}});push(other(),'🙏 '+S.names[me],'Sana bir teşekkür notu yazdı')};
+$('wk-save').onclick=()=>{const v=$('wk-input').value.trim();if(!v)return;save({week:{[wkey()]:{[me]:v}}});push(other(),'📝 '+S.names[me],'Haftalık check-in yazdı')};
+$('idea-btn').onclick=()=>{$('idea-text').textContent=IDEAS[Math.floor(Math.random()*IDEAS.length)]};
+$('lang-sel').onchange=e=>save({lang:{[me]:e.target.value}});
+buildBtns();
 init();
 </script>
 </body>
