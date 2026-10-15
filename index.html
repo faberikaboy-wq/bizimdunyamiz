@@ -33,7 +33,7 @@
             width: 100%;
             max-width: 480px;
             background: var(--card-bg);
-            height: 100vh;
+            min-height: 100vh;
             box-shadow: 0 0 20px rgba(255, 71, 87, 0.1);
             display: flex;
             flex-direction: column;
@@ -42,18 +42,18 @@
 
         @media(min-width: 481px) {
             .container {
-                height: 85vh;
+                min-height: 85vh;
                 border-radius: 20px;
                 overflow: hidden;
             }
         }
 
+        /* Ekranlar */
         .screen {
             display: none;
             flex: 1;
             flex-direction: column;
             height: 100%;
-            overflow: hidden;
         }
 
         .screen.active {
@@ -68,6 +68,16 @@
             text-align: center;
             background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
             color: white;
+        }
+
+        #login-screen h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        #login-screen p {
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
 
         .login-box {
@@ -91,6 +101,10 @@
             outline: none;
         }
 
+        .login-box input:focus {
+            border-color: var(--primary);
+        }
+
         .btn {
             background: var(--primary);
             color: white;
@@ -104,12 +118,25 @@
             transition: 0.2s;
         }
 
-        .btn:hover { opacity: 0.9; }
-        .btn.secondary { background: #747d8c; margin-top: 10px; font-size: 0.8rem; padding: 6px;}
+        .btn:hover {
+            opacity: 0.9;
+        }
 
-        #error-msg { color: #ff4757; margin-top: 10px; font-size: 0.9rem; display: none; }
+        .btn.secondary {
+            background: #747d8c;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            padding: 8px;
+        }
 
-        /* Header */
+        #error-msg {
+            color: #ff4757;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Ana İçerik Header */
         header {
             background: var(--primary);
             color: white;
@@ -119,6 +146,10 @@
             align-items: center;
         }
 
+        header h2 {
+            font-size: 1.2rem;
+        }
+
         .logout-btn {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -126,9 +157,10 @@
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 0.85rem;
         }
 
-        /* Sekme İçerikleri */
+        /* Sekmeler (Tabs) */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -146,16 +178,18 @@
             display: flex;
             background: white;
             border-top: 1px solid #eee;
-            height: 60px;
         }
 
         nav button {
             flex: 1;
             background: none;
             border: none;
+            padding: 12px 0;
+            font-size: 0.85rem;
             color: #747d8c;
             cursor: pointer;
             font-weight: 600;
+            transition: 0.2s;
         }
 
         nav button.active {
@@ -163,15 +197,15 @@
             border-top: 3px solid var(--primary);
         }
 
-        /* Doğum Günü Kutuları */
-        .countdown-container {
+        /* Doğum Günü Sayacı Kartları */
+        .birthday-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
-        .countdown-card {
+        .birthday-card {
             background: linear-gradient(135deg, #ff6b81, #ff4757);
             color: white;
             padding: 15px;
@@ -180,47 +214,67 @@
             box-shadow: 0 4px 15px rgba(255,71,87,0.2);
         }
 
-        .countdown-card h3 { font-size: 0.85rem; opacity: 0.9; margin-bottom: 5px;}
-        .countdown-card .days { font-size: 1.8rem; font-weight: bold; margin: 5px 0;}
-        .countdown-card p { font-size: 0.8rem; opacity: 0.8;}
+        .birthday-card h3 {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
 
-        /* Durum Takip Paneli */
-        .status-tracker {
+        .birthday-card .days {
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+
+        /* Durum İzleme Kartı (Hipoş İçin) */
+        .status-card {
             background: #fff;
             border: 2px solid #ffe0e6;
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
         }
-        .status-item {
+
+        .status-card h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .status-line {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 8px 0;
             border-bottom: 1px dashed #eee;
         }
-        .status-item:last-child { border: none; }
+        .status-line:last-child { border: none; }
+
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: bold;
         }
-        .badge.active-regl { background: #ff4757; color: white; }
-        .badge.active-moral { background: #ffa502; color: white; }
         .badge.normal { background: #2ed573; color: white; }
+        .badge.regl { background: #ff4757; color: white; }
+        .badge.moral { background: #ffa502; color: white; }
 
-        /* Medoş'un Özel Butonları */
-        .partner-controls {
+        /* Durum Değiştirme Paneli (Medoş İçin) */
+        .control-card {
             background: #f1f2f6;
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
         }
-        .status-btn {
+
+        .control-card h4 {
+            margin-bottom: 10px;
+        }
+
+        .toggle-btn {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
             background: white;
             border: 1px solid #ddd;
             padding: 12px;
@@ -228,23 +282,19 @@
             margin-bottom: 10px;
             cursor: pointer;
             font-weight: bold;
-            width: 100%;
         }
-        .status-btn.active-r { border-color: #ff4757; background: #ffe0e6; color: #ff4757; }
-        .status-btn.active-m { border-color: #ffa502; background: #fff4e0; color: #ffa502; }
+        .toggle-btn.on-regl { border-color: #ff4757; background: #ffe0e6; color: #ff4757; }
+        .toggle-btn.on-moral { border-color: #ffa502; background: #fff4e0; color: #ffa502; }
 
-        /* Sabitlenmiş Chat Alanı */
+        /* Chat Alanı */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #f1f2f6;
-            border-radius: 8px;
-            background: #fafafa;
+            margin-bottom: 15px;
+            max-height: calc(100vh - 250px);
         }
 
         .message {
@@ -253,20 +303,75 @@
             border-radius: 12px;
             font-size: 0.95rem;
             word-break: break-word;
+            position: relative;
         }
 
-        .message.mine { background: #ff4757; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .message.theirs { background: #e4e6eb; color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 2px; }
-        .message .sender-name { font-size: 0.7rem; opacity: 0.8; margin-bottom: 3px; display: block; }
+        .message.mine {
+            background: #ff4757;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
 
-        .chat-input-area { display: flex; gap: 8px; height: 45px; }
-        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .chat-input-area button { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .message.theirs {
+            background: #f1f2f6;
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
 
-        /* Ayarlar */
-        .settings-group { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 15px; }
-        .settings-group h4 { margin-bottom: 10px; color: var(--primary); }
-        .settings-group input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .message .sender-name {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-area button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Ayarlar & Şifre Değiştirme */
+        .settings-group {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .settings-group h4 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .settings-group input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
@@ -280,33 +385,3 @@
                 <input type="password" id="password-input" placeholder="••••" maxlength="6">
                 <button class="btn" onclick="tryLogin()">Giriş Yap</button>
                 <div id="error-msg">Geçersiz şifre!</div>
-                <button class="btn secondary" onclick="simulateRoleSwitch()">Giriş Modu: <span id="current-sim-role">Hipoş</span> (Değiştir)</button>
-            </div>
-        </div>
-
-        <!-- ANA UYGULAMA EKRANI -->
-        <div id="main-screen" class="screen">
-            <header>
-                <h2 id="welcome-title">Hoş Geldin ❤️</h2>
-                <button class="logout-btn" onclick="logout()">Çıkış</button>
-            </header>
-
-            <!-- SEKME 1: ANASAYFA -->
-            <div id="tab-home" class="content-area active">
-                <!-- DOĞUM GÜNÜ SAYACI -->
-                <div class="countdown-container">
-                    <div class="countdown-card">
-                        <h3 id="label-user-birthday">Doğum Günüme</h3>
-                        <div class="days" id="user-birthday-countdown">--</div>
-                        <p>Gün Kaldı</p>
-                    </div>
-                    <div class="countdown-card">
-                        <h3 id="label-partner-birthday">Doğum Gününe</h3>
-                        <div class="days" id="partner-birthday-countdown">--</div>
-                        <p>Gün Kaldı</p>
-                    </div>
-                </div>
-
-                <!-- DURUM TAKİP PANELİ (HİPOŞ GÖRÜR) -->
-                <div id="my-view-panel" class="status-tracker">
-                    <h4>Medoş'un Anlık Durumu 👑</h4>
